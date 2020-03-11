@@ -29,8 +29,8 @@ public class UserService {
 		return repository.findById(userId).orElse(null);
 	}
 
-	public boolean saveUserPhoto(MultipartFile photoFile) {
+	public boolean saveUserPhoto(UUID userId, MultipartFile photoFile) {
 		fileService.setDirectoryPathName(USER_PHOTO_DIRECTORY);
-		return fileService.saveFile(photoFile);
+		return fileService.saveFile(photoFile, userId.toString().concat(".jpg"));
 	}
 }

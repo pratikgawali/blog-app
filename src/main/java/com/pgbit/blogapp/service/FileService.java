@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -21,14 +20,13 @@ public class FileService {
 		this.directoryPathName = directoryPathName;
 	}
 
-	public boolean saveFile(MultipartFile file) {
+	public boolean saveFile(MultipartFile file, String fileName) {
 
 		String baseDirectoryPath = getAbsoluteBaseDirectoryPath();
 		if (!createDirectory(baseDirectoryPath)) {
 			return false;
 		}
 
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 		Path path = Paths.get(baseDirectoryPath.concat("\\").concat(fileName));
 		return copyFile(file, path);
 	}
