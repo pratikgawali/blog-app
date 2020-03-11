@@ -11,26 +11,30 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class PhotoService {
+public class FileService {
 	
 	//TODO: make it generic to adhere to any platform file system
+	
+	private String directoryPathName;
+	
+	public void setDirectoryPathName(String directoryPathName) {
+		this.directoryPathName = directoryPathName;
+	}
 
-	private static final String PHOTO_DIRECTORY_PATH = "\\resources\\photo";
-
-	public boolean saveUserPhoto(MultipartFile photoFile) {
+	public boolean saveFile(MultipartFile file) {
 
 		String baseDirectoryPath = getAbsoluteBaseDirectoryPath();
 		if (!createDirectory(baseDirectoryPath)) {
 			return false;
 		}
 
-		String photoFileName = StringUtils.cleanPath(photoFile.getOriginalFilename());
-		Path path = Paths.get(baseDirectoryPath.concat("\\").concat(photoFileName));
-		return copyFile(photoFile, path);
+		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+		Path path = Paths.get(baseDirectoryPath.concat("\\").concat(fileName));
+		return copyFile(file, path);
 	}
 
 	private String getAbsoluteBaseDirectoryPath() {
-		return System.getProperty("user.dir").concat(PHOTO_DIRECTORY_PATH);
+		return System.getProperty("user.dir").concat(directoryPathName);
 	}
 
 	private boolean createDirectory(String directoryPath) {
@@ -38,7 +42,7 @@ public class PhotoService {
 			Files.createDirectories(Paths.get(directoryPath));
 		} catch (IOException e) {
 			// TODO add logger
-			System.err.println("Error occurred while creating photo directory.");
+			System.err.println("Error occurred while creating directory.");
 			return false;
 		}
 		return true;
@@ -49,7 +53,7 @@ public class PhotoService {
 			Files.copy(fileToCopy.getInputStream(), toPath, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			// TODO add logger
-			System.err.println("Error occurred while saving user photo file.");
+			System.err.println("Error occurred while saving file.");
 			return false;
 		}
 		return true;
