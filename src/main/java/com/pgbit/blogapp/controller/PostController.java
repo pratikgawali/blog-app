@@ -18,7 +18,7 @@ import com.pgbit.blogapp.service.PostService;
 
 @RestController
 @RequestMapping("/api/posts")
-public class PostsController {
+public class PostController {
 
 	@Inject
 	private PostService postService;

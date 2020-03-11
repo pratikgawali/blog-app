@@ -9,7 +9,9 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -49,6 +51,10 @@ public class Post {
 	@Column(name = "LAST_MODIFIED_AT")
 	private Date lastModifiedAt;
 
+	@ManyToOne(targetEntity = User.class)
+	@JoinColumn(name = "USER_ID", nullable = false)
+	private User userId;
+	
 	public UUID getId() {
 		return id;
 	}
@@ -103,5 +109,13 @@ public class Post {
 
 	public void setLastModifiedAt(Date lastModifiedAt) {
 		this.lastModifiedAt = lastModifiedAt;
+	}
+
+	public User getUserId() {
+		return userId;
+	}
+
+	public void setUserId(User userId) {
+		this.userId = userId;
 	}
 }
