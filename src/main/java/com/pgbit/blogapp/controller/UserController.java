@@ -36,7 +36,9 @@ public class UserController {
 	}
 
 	@PostMapping("/photo")
-	public ResponseEntity<String> saveUserProfilePicture(@RequestParam("userId") UUID userId, @RequestParam("photo") MultipartFile photoFile) {
+	public ResponseEntity<String> saveUserProfilePhoto(@RequestParam("userId") String userId,
+			@RequestParam("photo") MultipartFile photoFile) {
+		
 		HttpStatus responseStatus = userService.saveUserPhoto(userId, photoFile) ? HttpStatus.OK
 				: HttpStatus.INTERNAL_SERVER_ERROR;
 		return new ResponseEntity<>(responseStatus);

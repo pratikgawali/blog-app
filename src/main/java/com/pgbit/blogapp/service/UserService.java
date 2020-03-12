@@ -12,14 +12,15 @@ import com.pgbit.blogapp.repository.IUserRepository;
 
 @Service
 public class UserService {
-	
-	private static final String USER_PHOTO_DIRECTORY = "\\resources\\photo";
+
+	private static final String USER_PHOTO_DIRECTORY = "/images/user";
+	private static final String PHOTO_FILE_EXTENSION = ".jpg";
 
 	@Inject
 	private IUserRepository repository;
-	
+
 	@Inject
-	private FileService fileService;
+	private IFileService fileService;
 
 	public User saveUser(User user) {
 		return repository.save(user);
@@ -29,8 +30,11 @@ public class UserService {
 		return repository.findById(userId).orElse(null);
 	}
 
-	public boolean saveUserPhoto(UUID userId, MultipartFile photoFile) {
-		fileService.setDirectoryPathName(USER_PHOTO_DIRECTORY);
-		return fileService.saveFile(photoFile, userId.toString().concat(".jpg"));
+	public boolean saveUserPhoto(String userId, MultipartFile photoFile) {
+		return fileService.uploadFile(photoFile, USER_PHOTO_DIRECTORY, getUserPhotoFileName(userId));
+	}
+
+	private String getUserPhotoFileName(String userId) {
+		return userId.concat(PHOTO_FILE_EXTENSION);
 	}
 }
