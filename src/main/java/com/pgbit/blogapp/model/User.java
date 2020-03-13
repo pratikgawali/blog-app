@@ -33,6 +33,9 @@ public class User {
 	@Column(name = "CREDENTIALS")
 	private String credentials;
 	
+	@Column(name = "IMAGE_ID")
+	private String imageId;
+	
 	public UUID getId() {
 		return id;
 	}
@@ -71,5 +74,13 @@ public class User {
 
 	public void setCredentials(String credentials) {
 		this.credentials = credentials;
+	}
+
+	public String getImageId() {
+		return imageId;
+	}
+
+	public void setImageId(String imageId) {
+		this.imageId = imageId;
 	}
 }
