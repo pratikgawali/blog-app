@@ -15,7 +15,7 @@ import com.pgbit.blogapp.exception.FileStorageException;
 import com.pgbit.blogapp.exception.TechnicalException;
 import com.pgbit.blogapp.model.User;
 import com.pgbit.blogapp.repository.IUserRepository;
-import com.pgbit.blogapp.service.storage.FileStorageParameterKeys;
+import static com.pgbit.blogapp.service.storage.FileStorageParameterKeys.*;
 import com.pgbit.blogapp.service.storage.IFileStorageService;
 
 @Service
@@ -38,12 +38,25 @@ public class UserService {
 	}
 
 	public void saveUserImage(String userId, MultipartFile imageFile) throws TechnicalException {
+		
 		Map<String, Object> parameters = new HashMap<>();
-		parameters.put(FileStorageParameterKeys.USER_ID, userId);
+		parameters.put(USER_ID, userId);
 		try {
 			fileStorageService.uploadFile(imageFile, parameters);
 		} catch (FileStorageException e) {
 			LOGGER.error("Error occurred while uploading user image file.");
+			throw new TechnicalException(e);
+		}
+	}
+	
+	public void deleteUserImage(String userId) throws TechnicalException {
+		
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put(USER_ID, userId);
+		try {
+			fileStorageService.deleteFile(parameters);
+		} catch (FileStorageException e) {
+			LOGGER.error("Error occurred while deleting user image file.");
 			throw new TechnicalException(e);
 		}
 	}

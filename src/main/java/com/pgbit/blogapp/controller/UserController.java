@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +40,12 @@ public class UserController {
 			throws TechnicalException {
 
 		userService.saveUserImage(userId, imageFile);
+	}
+	
+	@DeleteMapping("/photo/{userId}")
+	public void deleteUserImage(@PathVariable(name = "userId") String userId)
+			throws TechnicalException {
+
+		userService.deleteUserImage(userId);
 	}
 }

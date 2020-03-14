@@ -12,4 +12,8 @@ public class CloudinaryKeys {
 	
 	// response parameter keys
 	static final String PUBLIC_ID = "public_id";
+	static final String RESULT = "result";
+	
+	// response parameter value
+	static final String OK = "ok";
 }

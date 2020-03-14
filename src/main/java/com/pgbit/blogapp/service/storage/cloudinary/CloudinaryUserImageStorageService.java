@@ -2,7 +2,7 @@ package com.pgbit.blogapp.service.storage.cloudinary;
 
 import static com.pgbit.blogapp.service.storage.FileStorageParameterKeys.USER_ID;
 import static com.pgbit.blogapp.service.storage.FileStorageParameterKeys.USER_IMAGE_FOLDER_PATH;
-import static com.pgbit.blogapp.service.storage.cloudinary.CloudinaryKeys.FOLDER;
+import static com.pgbit.blogapp.service.storage.cloudinary.CloudinaryKeys.*;
 import static com.pgbit.blogapp.service.storage.cloudinary.CloudinaryKeys.PUBLIC_ID;
 
 import java.io.IOException;
@@ -67,13 +67,33 @@ public class CloudinaryUserImageStorageService implements IFileStorageService {
 			throw new FileStorageException("User does not exist for whom the image is to be uploaded.");
 		}
 
-		// delete previous user image
-		deleteImage(user.getImageId());
-
 		// upload new image and save its image id
 		String qualifiedImageId = uploadImage(imageFile, user.getImageId());
 		String imageId = fetchImageId(qualifiedImageId);
 		user.setImageId(imageId);
+		userService.saveUser(user);
+	}
+
+	/**
+	 * Deletes the image file associated to the given user.
+	 * 
+	 * @param parameters contains userId to identify user.
+	 * @throws FileStorageException
+	 */
+	@Override
+	public void deleteFile(Map<String, Object> parameters) throws FileStorageException {
+
+		// fetch user details
+		String userId = String.valueOf(parameters.get(USER_ID));
+		User user = userService.getUser(UUID.fromString(userId));
+		if (!userExists(user)) {
+			LOGGER.error("User does not exist for whose the image is to be deleted.");
+			throw new FileStorageException("User does not exist for whose the image is to be deleted.");
+		}
+
+		deleteImage(user.getImageId());
+
+		user.setImageId(null);
 		userService.saveUser(user);
 	}
 
@@ -88,7 +108,13 @@ public class CloudinaryUserImageStorageService implements IFileStorageService {
 		if (imageExists(imageId)) {
 			try {
 				String qualifiedImageId = prepareQualifiedImageId(imageId);
-				cloudinary.uploader().destroy(qualifiedImageId, ObjectUtils.emptyMap());
+				Map deleteResponse = cloudinary.uploader().destroy(qualifiedImageId, ObjectUtils.emptyMap());
+
+				if (!isCloudinaryDeleteOperationSuccess(deleteResponse)) {
+					LOGGER.error("Unsuccessful in deleting user image file from Cloudinary cloud storage");
+					throw new FileStorageException(
+							"Unsuccessful in deleting user image file from Cloudinary cloud storage");
+				}
 			} catch (IOException e) {
 				LOGGER.error("Exception occurred while deleting user image file from Cloudinary cloud storage");
 				throw new FileStorageException(e);
@@ -160,5 +186,16 @@ public class CloudinaryUserImageStorageService implements IFileStorageService {
 	 */
 	private boolean userExists(User user) {
 		return !Objects.isNull(user);
+	}
+
+	/**
+	 * Check if the delete operation performed by Cloudinary is successful.
+	 * 
+	 * @param deleteResponse the response of delete operation returned from
+	 *                       Cloudinary API.
+	 * @return true if delete was successful, otherwise false.
+	 */
+	private boolean isCloudinaryDeleteOperationSuccess(Map deleteResponse) {
+		return OK.equals(deleteResponse.get(RESULT));
 	}
 }
