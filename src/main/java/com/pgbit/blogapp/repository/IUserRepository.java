@@ -9,5 +9,4 @@ import com.pgbit.blogapp.model.User;
 
 @Repository
 public interface IUserRepository extends JpaRepository<User, UUID> {
-
 }

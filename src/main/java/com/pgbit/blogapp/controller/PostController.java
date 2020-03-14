@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pgbit.blogapp.exception.TechnicalException;
 import com.pgbit.blogapp.model.Post;
 import com.pgbit.blogapp.service.PostService;
 
@@ -29,7 +30,7 @@ public class PostController {
 	}
 
 	@GetMapping("/{postId}")
-	public Post getPost(@PathVariable(name = "postId") UUID postId) {
+	public Post getPost(@PathVariable(name = "postId") UUID postId) throws TechnicalException {
 		return postService.readPost(postId);
 	}
 
@@ -41,5 +42,10 @@ public class PostController {
 	@DeleteMapping("/{postId}")
 	public void deletePost(@PathVariable(name = "postId") UUID postId) {
 		postService.deletePost(postId);
+	}
+	
+	@PostMapping("/upVote/{postId}")
+	public void incrementUpVotes(@PathVariable(name = "postId") UUID postId) throws TechnicalException {
+		postService.incrementUpVotes(postId);
 	}
 }

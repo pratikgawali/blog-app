@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +20,8 @@ import com.pgbit.blogapp.service.storage.IFileStorageService;
 
 @Service
 public class UserService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
 	@Inject
 	private IUserRepository repository;
@@ -39,7 +43,7 @@ public class UserService {
 		try {
 			fileStorageService.uploadFile(imageFile, parameters);
 		} catch (FileStorageException e) {
-			// TODO add logger message
+			LOGGER.error("Error occurred while uploading user image file.");
 			throw new TechnicalException(e);
 		}
 	}

@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,8 @@ import com.pgbit.blogapp.service.storage.IFileStorageService;
 public class CloudinaryUserImageStorageService implements IFileStorageService {
 
 	private static final String SEPARATOR = "/";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CloudinaryUserImageStorageService.class);
 
 	@Inject
 	private Environment env;
@@ -59,7 +63,7 @@ public class CloudinaryUserImageStorageService implements IFileStorageService {
 		String userId = String.valueOf(parameters.get(USER_ID));
 		User user = userService.getUser(UUID.fromString(userId));
 		if (!userExists(user)) {
-			// TODO: add logger message
+			LOGGER.error("User does not exist for whom the image is to be uploaded.");
 			throw new FileStorageException("User does not exist for whom the image is to be uploaded.");
 		}
 
@@ -86,7 +90,7 @@ public class CloudinaryUserImageStorageService implements IFileStorageService {
 				String qualifiedImageId = prepareQualifiedImageId(imageId);
 				cloudinary.uploader().destroy(qualifiedImageId, ObjectUtils.emptyMap());
 			} catch (IOException e) {
-				// TODO add logger image
+				LOGGER.error("Exception occurred while deleting user image file from Cloudinary cloud storage");
 				throw new FileStorageException(e);
 			}
 		}
@@ -109,7 +113,7 @@ public class CloudinaryUserImageStorageService implements IFileStorageService {
 			return String.valueOf(uploadResult.get(PUBLIC_ID));
 
 		} catch (IOException e) {
-			// TODO add logger message
+			LOGGER.error("Exception occurred while uploading user image file to Cloudinary cloud storage");
 			throw new FileStorageException(e);
 		}
 	}
