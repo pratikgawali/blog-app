@@ -2,6 +2,7 @@ package com.pgbit.blogapp.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -62,12 +63,20 @@ public class UserService {
 	 * @param imageFile image file of the {@link User}.
 	 * @throws TechnicalException
 	 */
-	public void saveUserImage(String userId, MultipartFile imageFile) throws TechnicalException {
+	public void saveUserImage(UUID userId, MultipartFile imageFile) throws TechnicalException {
+
+		User user = getUser(userId);
+		if (Objects.isNull(user)) {
+			LOGGER.error("User does not exist for whom the image is to be uploaded.");
+			throw new TechnicalException("User does not exist for whom the image is to be uploaded.");
+		}
 
 		Map<String, Object> parameters = new HashMap<>();
-		parameters.put(USER_ID, userId);
+		parameters.put(FILE_ID, user.getImageId());
 		try {
-			fileStorageService.uploadFile(imageFile, parameters);
+			String imageId = fileStorageService.uploadFile(imageFile, parameters);
+			user.setImageId(imageId);
+			saveUser(user);
 		} catch (FileStorageException e) {
 			LOGGER.error("Error occurred while uploading user image file.");
 			throw new TechnicalException(e);
@@ -80,12 +89,25 @@ public class UserService {
 	 * @param userId id of {@link User} whose image needs to be deleted.
 	 * @throws TechnicalException
 	 */
-	public void deleteUserImage(String userId) throws TechnicalException {
+	public void deleteUserImage(UUID userId) throws TechnicalException {
+
+		User user = getUser(userId);
+		
+		if (Objects.isNull(user)) {
+			LOGGER.error("User does not exist whose image is to be deleted.");
+			throw new TechnicalException("User does not exist whose image is to be deleted.");
+		}
+		if (Objects.isNull(user.getImageId())) {
+			LOGGER.error("No image exists to delete for the given user.");
+			throw new TechnicalException("No image exists to delete for the given user.");
+		}
 
 		Map<String, Object> parameters = new HashMap<>();
-		parameters.put(USER_ID, userId);
+		parameters.put(FILE_ID, user.getImageId());
 		try {
 			fileStorageService.deleteFile(parameters);
+			user.setImageId(null);
+			saveUser(user);
 		} catch (FileStorageException e) {
 			LOGGER.error("Error occurred while deleting user image file.");
 			throw new TechnicalException(e);

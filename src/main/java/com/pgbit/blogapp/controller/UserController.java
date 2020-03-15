@@ -61,7 +61,7 @@ public class UserController {
 	 * @throws TechnicalException
 	 */
 	@PostMapping("/photo")
-	public void saveUserImage(@RequestParam("userId") String userId, @RequestParam("photo") MultipartFile imageFile)
+	public void saveUserImage(@RequestParam("userId") UUID userId, @RequestParam("photo") MultipartFile imageFile)
 			throws TechnicalException {
 
 		userService.saveUserImage(userId, imageFile);
@@ -74,7 +74,7 @@ public class UserController {
 	 * @throws TechnicalException
 	 */
 	@DeleteMapping("/photo/{userId}")
-	public void deleteUserImage(@PathVariable(name = "userId") String userId) throws TechnicalException {
+	public void deleteUserImage(@PathVariable(name = "userId") UUID userId) throws TechnicalException {
 
 		userService.deleteUserImage(userId);
 	}

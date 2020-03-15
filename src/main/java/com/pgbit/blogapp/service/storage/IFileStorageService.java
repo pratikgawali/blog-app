@@ -20,9 +20,10 @@ public interface IFileStorageService {
 	 * @param file       to be uploaded.
 	 * @param parameters that may be required for {@link IFileStorageService}
 	 *                   implementor.
+	 * @return identifier of the image saved, like a filename.
 	 * @throws FileStorageException
 	 */
-	void uploadFile(MultipartFile file, Map<String, Object> parameters) throws FileStorageException;
+	String uploadFile(MultipartFile file, Map<String, Object> parameters) throws FileStorageException;
 
 	/**
 	 * Deletes the file identified by the given parameters from storage.
