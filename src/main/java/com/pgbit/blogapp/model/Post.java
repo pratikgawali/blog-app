@@ -58,8 +58,8 @@ public class Post {
 	private Date lastModifiedAt;
 
 	@ManyToOne(targetEntity = User.class)
-	@JoinColumn(name = "USER_ID", nullable = false)
-	private User userId;
+	@JoinColumn(name = "AUTHOR", nullable = false)
+	private User author;
 	
 	public UUID getId() {
 		return id;
@@ -117,11 +117,11 @@ public class Post {
 		this.lastModifiedAt = lastModifiedAt;
 	}
 
-	public User getUserId() {
-		return userId;
+	public User getAuthor() {
+		return author;
 	}
 
-	public void setUserId(User userId) {
-		this.userId = userId;
+	public void setAuthor(User author) {
+		this.author = author;
 	}
 }
