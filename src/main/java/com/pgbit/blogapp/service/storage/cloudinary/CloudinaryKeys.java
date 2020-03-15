@@ -1,5 +1,13 @@
 package com.pgbit.blogapp.service.storage.cloudinary;
 
+import com.cloudinary.Cloudinary;
+
+/**
+ * Constants class for storing key strings relevant for {@link Cloudinary} operations.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 public class CloudinaryKeys {
 
 	// credentials keys

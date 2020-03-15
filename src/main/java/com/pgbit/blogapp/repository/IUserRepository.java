@@ -7,6 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import com.pgbit.blogapp.model.User;
 
+/**
+ * Repository interface for database operations on {@link User} entity.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @Repository
 public interface IUserRepository extends JpaRepository<User, UUID> {
 }

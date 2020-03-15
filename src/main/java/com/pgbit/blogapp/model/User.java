@@ -11,6 +11,12 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
 
+/**
+ * Model class for {@link User} entity.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @Entity
 @Table(name = "USER")
 public class User {

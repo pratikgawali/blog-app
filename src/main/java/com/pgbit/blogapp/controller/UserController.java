@@ -18,6 +18,12 @@ import com.pgbit.blogapp.exception.TechnicalException;
 import com.pgbit.blogapp.model.User;
 import com.pgbit.blogapp.service.UserService;
 
+/**
+ * Controller for handling requests related to {@link User}.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -25,26 +31,50 @@ public class UserController {
 	@Inject
 	private UserService userService;
 
+	/**
+	 * Gets {@link User} identified by the given user id.
+	 * 
+	 * @param userId id of the user.
+	 * @return {@link User} instance identified by the given user id.
+	 */
 	@GetMapping("/{userId}")
 	public User getUser(@PathVariable(name = "userId") UUID userId) {
 		return userService.getUser(userId);
 	}
 
+	/**
+	 * Creates a new instance of {@link User}.
+	 * 
+	 * @param user {@link User} instance to be saved.
+	 * @return the saved {@link User} instance.
+	 */
 	@PostMapping
 	public User createUser(@RequestBody User user) {
 		return userService.saveUser(user);
 	}
 
+	/**
+	 * Saves image of the {@link User} identified by the given user id.
+	 * 
+	 * @param userId    id of the {@link User} for whom image needs to be saved.
+	 * @param imageFile image file to be saved.
+	 * @throws TechnicalException
+	 */
 	@PostMapping("/photo")
 	public void saveUserImage(@RequestParam("userId") String userId, @RequestParam("photo") MultipartFile imageFile)
 			throws TechnicalException {
 
 		userService.saveUserImage(userId, imageFile);
 	}
-	
+
+	/**
+	 * Deletes image of the {@link User} identified by the given user id.
+	 * 
+	 * @param userId id of the {@link User} for whom image needs to be deleted.
+	 * @throws TechnicalException
+	 */
 	@DeleteMapping("/photo/{userId}")
-	public void deleteUserImage(@PathVariable(name = "userId") String userId)
-			throws TechnicalException {
+	public void deleteUserImage(@PathVariable(name = "userId") String userId) throws TechnicalException {
 
 		userService.deleteUserImage(userId);
 	}
