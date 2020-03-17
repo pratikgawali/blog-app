@@ -1,3 +1,19 @@
+------------------------------------------------------
 Things that needs to be done:
+------------------------------------------------------
+Admin must be able to update role of a user
+Make service functions transactional
+Store default userId, password to protect create user api
 
+
+
+
+
+
+
+
+
+------------------------------------------------------
+Done:
+------------------------------------------------------
 Use image storage service instead of storing on the application file system path

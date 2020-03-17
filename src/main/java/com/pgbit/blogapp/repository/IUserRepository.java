@@ -1,5 +1,6 @@
 package com.pgbit.blogapp.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ import com.pgbit.blogapp.model.User;
  */
 @Repository
 public interface IUserRepository extends JpaRepository<User, UUID> {
+	
+	Optional<User> findByEmailId(String emailId);
 }

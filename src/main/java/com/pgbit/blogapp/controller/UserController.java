@@ -43,13 +43,14 @@ public class UserController {
 	}
 
 	/**
-	 * Creates a new instance of {@link User}.
+	 * Saves the given {@link User} instance.
 	 * 
 	 * @param user {@link User} instance to be saved.
 	 * @return the saved {@link User} instance.
+	 * @throws TechnicalException 
 	 */
 	@PostMapping
-	public User createUser(@RequestBody User user) {
+	public User saveUser(@RequestBody User user) throws TechnicalException {
 		return userService.saveUser(user);
 	}
 
