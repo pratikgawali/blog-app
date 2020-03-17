@@ -1,0 +1,583 @@
+{
+	"info": {
+		"_postman_id": "e9e3217a-6acf-4a40-95c6-9e66440fb747",
+		"name": "BlogApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User CRUD",
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1e86d4c8-9c28-4209-9ac8-b965fd354001",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2bbc3baa-e9ed-4ca9-8785-9af9f0ffab0e",
+								"exec": [
+									"pm.test(\"User created successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.environment.set(\"userId\", pm.response.json().id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"firstName\": \"Pratik\",\n\t\"lastName\": \"Gawali\",\n\t\"emailId\": \"pratik.r.gawali@gmail.com\",\n\t\"credentials\": \"Developer\",\n\t\"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{applicationUrl}}/api/user",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get  JWT Token",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1e86d4c8-9c28-4209-9ac8-b965fd354001",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2bbc3baa-e9ed-4ca9-8785-9af9f0ffab0e",
+								"exec": [
+									"pm.test(\"JWT toke generated successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.environment.set(\"jwt\", pm.response.json().jwt);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"pratik.r.gawali@gmail.com\",\n\t\"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{applicationUrl}}/authenticate",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a40b1b5d-ac08-49c2-a8db-0df8672bae91",
+								"exec": [
+									"pm.test(\"User read successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{applicationUrl}}/api/user/{{userId}}",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "24b16da0-d92a-4977-831e-91cd9a7d9f25",
+								"exec": [
+									"pm.test(\"User updated successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{userId}}\",\r\n    \"firstName\": \"Prateek\",\r\n    \"lastName\": \"Gawali\",\r\n    \"emailId\": \"pratik.r.gawali@gmail.com\",\r\n    \"credentials\": \"Developer\",\r\n    \"imageId\": null,\r\n    \"password\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{applicationUrl}}/api/user",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Profile Image",
+			"item": [
+				{
+					"name": "Upload User Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0c13fc8b-973b-45e9-a25c-6da23ae04687",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"contentType": "multipart/form-data",
+									"type": "file",
+									"src": "/C:/Users/i341876/Pictures/smileyGreen.png"
+								},
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{applicationUrl}}/api/user/photo",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"photo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "da49c0bb-69a8-48f0-9b52-9e7da5f77ed5",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{applicationUrl}}/api/user/photo/{{userId}}",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"photo",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Post CRUD",
+			"item": [
+				{
+					"name": "Create Post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1e86d4c8-9c28-4209-9ac8-b965fd354001",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2bbc3baa-e9ed-4ca9-8785-9af9f0ffab0e",
+								"exec": [
+									"pm.test(\"Post created successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.environment.set(\"postId\", pm.response.json().id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"How much do you value solitude in your life?\",\n\t\"content\": \"Have you ever noticed how most of us automatically start browsing our cell phones whenever we feel alone at a party? There might not be anything relevant to browse, but we still keep looking at the phone. Why? Because most of us are afraid of being alone. When we are with someone, we feel occupied. When we are alone, we feel restless and start fidgeting around to find something to do, be it looking at the cell phone or watching television. I find solitude the most important and underrated aspect in life. When I am with others, I am simply passing time. But the time when I am alone is the time when I am truly making the most of my time. Solitude gives me the chance to think deep, plan and utilize my time to the most. I spend most of my free time sitting alone in cafes, when I can think and do something productive. I like taking evening walks completely alone, because that gives me a chance to just refresh my thoughts and regain energy. Being with others will always consume your energy, while being alone will give you a chance to rejuvenate that energy. When someone asks me how I find time to do so many things, I tell them to start spending less time with others and more time with yourself. You will realize that you suddenly have a lot of free time to think, plan and act. You will feel more energised and productive. There is nobody who can be a better companion for you than yourself.\",\n\t\"views\": 69400,\n\t\"upVotes\": 4000,\n\t\"author\": {\"id\":\"{{userId}}\"}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{applicationUrl}}/api/posts",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{applicationUrl}}/api/posts/{{postId}}",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{applicationUrl}}/api/posts",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1e86d4c8-9c28-4209-9ac8-b965fd354001",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2bbc3baa-e9ed-4ca9-8785-9af9f0ffab0e",
+								"exec": [
+									"pm.test(\"Post created successfully\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwt}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"{{postId}}\",\n\t\"title\": \"Updated: How much do you value solitude in your life?\",\n\t\"content\": \"Have you ever noticed how most of us automatically start browsing our cell phones whenever we feel alone at a party? There might not be anything relevant to browse, but we still keep looking at the phone. Why? Because most of us are afraid of being alone. When we are with someone, we feel occupied. When we are alone, we feel restless and start fidgeting around to find something to do, be it looking at the cell phone or watching television. I find solitude the most important and underrated aspect in life. When I am with others, I am simply passing time. But the time when I am alone is the time when I am truly making the most of my time. Solitude gives me the chance to think deep, plan and utilize my time to the most. I spend most of my free time sitting alone in cafes, when I can think and do something productive. I like taking evening walks completely alone, because that gives me a chance to just refresh my thoughts and regain energy. Being with others will always consume your energy, while being alone will give you a chance to rejuvenate that energy. When someone asks me how I find time to do so many things, I tell them to start spending less time with others and more time with yourself. You will realize that you suddenly have a lot of free time to think, plan and act. You will feel more energised and productive. There is nobody who can be a better companion for you than yourself.\",\n\t\"views\": 69400,\n\t\"upVotes\": 4000,\n\t\"author\": {\"id\":\"{{userId}}\"}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{applicationUrl}}/api/posts",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upvote Post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bcdbc3e4-da89-43fd-8895-77d719da10a4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{applicationUrl}}/api/posts/upVote/{{postId}}",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"upVote",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{applicationUrl}}/api/posts/{{postId}}",
+							"host": [
+								"{{applicationUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
