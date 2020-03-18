@@ -5,6 +5,13 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * Stores user details to be used for authentication and authorization by spring
+ * security.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 public class CustomUserDetails implements UserDetails {
 
 	private static final long serialVersionUID = 1L;

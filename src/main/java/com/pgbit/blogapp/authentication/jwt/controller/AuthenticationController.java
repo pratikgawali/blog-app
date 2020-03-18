@@ -19,6 +19,13 @@ import com.pgbit.blogapp.authentication.jwt.model.AuthenticationResponse;
 import com.pgbit.blogapp.authentication.jwt.util.JwtUtil;
 import com.pgbit.blogapp.authentication.service.CustomUserDetailsService;
 
+/**
+ * Controller class for handling requests related to authentication, like
+ * generating a JWT token.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @RestController
 @RequestMapping
 public class AuthenticationController {
@@ -27,28 +34,38 @@ public class AuthenticationController {
 
 	@Inject
 	private AuthenticationManager authenticationManager;
-	
+
 	@Inject
 	private CustomUserDetailsService userDetailsService;
-	
+
 	@Inject
 	private JwtUtil jwtUtil;
 
+	/**
+	 * Creates JWT authentication token by verifying the credentials in the given
+	 * {@link AuthenticationRequest} instance.
+	 * 
+	 * @param authenticationRequest contains user credentials
+	 * @return JWT token
+	 * @throws Exception
+	 */
 	@PostMapping("/authenticate")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
 			throws Exception {
 
+		String username = authenticationRequest.getEmailId();
+		
 		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username,
 					authenticationRequest.getPassword()));
 		} catch (BadCredentialsException e) {
 			LOGGER.error("Incorrect username or password");
 			throw new Exception("Incorrect username or password", e);
 		}
-		
-		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
+
+		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 		String jwt = jwtUtil.generateToken(userDetails);
-		
+
 		return ResponseEntity.ok(new AuthenticationResponse(jwt));
 	}
 }

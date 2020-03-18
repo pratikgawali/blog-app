@@ -1,4 +1,4 @@
-package com.pgbit.blogapp.model;
+package com.pgbit.blogapp.security;
 
 public enum RolesEnum {
 

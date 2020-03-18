@@ -12,6 +12,12 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Model class for {@link Role} entity.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @Entity
 @Table(name = "ROLE")
 public class Role {

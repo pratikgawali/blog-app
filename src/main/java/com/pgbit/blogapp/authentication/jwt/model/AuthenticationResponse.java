@@ -1,5 +1,11 @@
 package com.pgbit.blogapp.authentication.jwt.model;
 
+/**
+ * JWT authentication response.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 public class AuthenticationResponse {
 
 	private String jwt;

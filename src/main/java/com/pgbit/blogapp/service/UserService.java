@@ -20,11 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.pgbit.blogapp.exception.FileStorageException;
 import com.pgbit.blogapp.exception.TechnicalException;
 import com.pgbit.blogapp.model.Role;
-import com.pgbit.blogapp.model.RolesEnum;
 import com.pgbit.blogapp.model.User;
 import com.pgbit.blogapp.model.UserRoles;
 import com.pgbit.blogapp.repository.IRoleRepository;
 import com.pgbit.blogapp.repository.IUserRepository;
+import com.pgbit.blogapp.security.RolesEnum;
 import com.pgbit.blogapp.service.storage.IFileStorageService;
 
 /**

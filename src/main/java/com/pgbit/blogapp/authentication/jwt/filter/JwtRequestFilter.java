@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,6 +20,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.pgbit.blogapp.authentication.jwt.util.JwtUtil;
 import com.pgbit.blogapp.authentication.service.CustomUserDetailsService;
 
+/**
+ * Filter class for enabling JWT authorization for all incoming request for
+ * protected APIs. The filter is added before
+ * {@link UsernamePasswordAuthenticationFilter}.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -28,18 +37,29 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Inject
 	private JwtUtil jwtUtil;
 
+	private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
+	private static final String JWT_PREFIX = "Bearer ";
+
+	/**
+	 * Extracts JWT token from the incoming request header, verifies it and stores
+	 * authentication information into the security context.
+	 * 
+	 * @param request     incoming request
+	 * @param response
+	 * @param filterChain the chain of servlet filters
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
-		String authorizationHeader = request.getHeader("Authorization");
+		String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER_KEY);
 
 		String userName = null;
 		String jwt = null;
 
 		// TODO make constants
-		if (!Objects.isNull(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
-			jwt = authorizationHeader.substring(7);
+		if (!Objects.isNull(authorizationHeader) && authorizationHeader.startsWith(JWT_PREFIX)) {
+			jwt = authorizationHeader.substring(JWT_PREFIX.length());
 			userName = jwtUtil.extractUsername(jwt);
 		}
 
@@ -54,7 +74,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			}
 		}
-		
+
 		filterChain.doFilter(request, response);
 	}
 

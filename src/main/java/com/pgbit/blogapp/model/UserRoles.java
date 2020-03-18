@@ -14,6 +14,12 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Type;
 
+/**
+ * Model class for {@link UserRoles} entity.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @Entity
 @Table(name = "USER_ROLES", uniqueConstraints = @UniqueConstraint(columnNames = { "USER_ID", "ROLE_ID" }))
 public class UserRoles {

@@ -7,6 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import com.pgbit.blogapp.model.Role;
 
+/**
+ * Repository interface for database operations on {@link Role} entity.
+ * 
+ * @author Pratik Gawali
+ *
+ */
 @Repository
 public interface IRoleRepository extends JpaRepository<Role, Integer>{
 	
