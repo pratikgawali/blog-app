@@ -1,22 +1,30 @@
 package com.pgbit.blogapp.service;
 
+import static com.pgbit.blogapp.service.storage.FileStorageParameterKeys.FILE_ID;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pgbit.blogapp.exception.FileStorageException;
 import com.pgbit.blogapp.exception.TechnicalException;
+import com.pgbit.blogapp.model.Role;
 import com.pgbit.blogapp.model.User;
+import com.pgbit.blogapp.model.UserRoles;
+import com.pgbit.blogapp.repository.IRoleRepository;
 import com.pgbit.blogapp.repository.IUserRepository;
-import static com.pgbit.blogapp.service.storage.FileStorageParameterKeys.*;
+import com.pgbit.blogapp.security.RolesEnum;
 import com.pgbit.blogapp.service.storage.IFileStorageService;
 
 /**
@@ -31,19 +39,47 @@ public class UserService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
 	@Inject
-	private IUserRepository repository;
+	private IUserRepository userRepository;
+	
+	@Inject
+	private IRoleRepository roleRepository;
 
 	@Inject
 	private IFileStorageService fileStorageService;
 
+	@Inject
+	private PasswordEncoder passwordEncoder;
+
 	/**
-	 * Saves the given {@link User}.
+	 * Saves the given {@link User} with the password encoded.
 	 * 
 	 * @param user {@link User} instance.
 	 * @return the {@link User} saved instance.
+	 * @throws TechnicalException
 	 */
-	public User saveUser(User user) {
-		return repository.save(user);
+	//TODO: make transactional
+	public User saveUser(User user) throws TechnicalException {
+		
+		boolean isNewUser = Objects.isNull(user.getId());
+	
+		String password = user.getPassword();
+		if (!Objects.isNull(password)) {
+			String encodedPassword = passwordEncoder.encode(password);
+			user.setPassword(encodedPassword);
+		}
+		
+		// assign default role to a new user
+		if (isNewUser) {
+			
+			Optional<Role> queryResult = roleRepository.findByName(RolesEnum.USER.getRoleName());
+			queryResult.orElseThrow(()-> new TechnicalException("Given role does not exist to be assigned to a user"));
+			Role role = queryResult.get();
+			
+			UserRoles userRoles = new UserRoles(user, role);
+			user.setUserRoles(Arrays.asList(userRoles));
+		}
+		
+		return userRepository.save(user);
 	}
 
 	/**
@@ -53,7 +89,8 @@ public class UserService {
 	 * @return {@link User} instance identified by the given user id.
 	 */
 	public User getUser(UUID userId) {
-		return repository.findById(userId).orElse(null);
+
+		return userRepository.findById(userId).orElse(null);
 	}
 
 	/**
@@ -92,7 +129,7 @@ public class UserService {
 	public void deleteUserImage(UUID userId) throws TechnicalException {
 
 		User user = getUser(userId);
-		
+
 		if (Objects.isNull(user)) {
 			LOGGER.error("User does not exist whose image is to be deleted.");
 			throw new TechnicalException("User does not exist whose image is to be deleted.");
