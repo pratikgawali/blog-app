@@ -7,18 +7,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pgbit.blogapp.exception.FileStorageException;
 import com.pgbit.blogapp.exception.TechnicalException;
+import com.pgbit.blogapp.exception.ValidationException;
 import com.pgbit.blogapp.model.Role;
 import com.pgbit.blogapp.model.User;
 import com.pgbit.blogapp.model.UserRoles;
@@ -26,9 +27,11 @@ import com.pgbit.blogapp.repository.IRoleRepository;
 import com.pgbit.blogapp.repository.IUserRepository;
 import com.pgbit.blogapp.security.RolesEnum;
 import com.pgbit.blogapp.service.storage.IFileStorageService;
+import com.pgbit.blogapp.validation.IValidator;
+import com.pgbit.blogapp.validation.UserDetailsValidator;
 
 /**
- * Service class for operations on {@link User} entity.
+ * Service class for operations related to user.
  * 
  * @author Pratik Gawali
  *
@@ -40,9 +43,12 @@ public class UserService {
 
 	@Inject
 	private IUserRepository userRepository;
-	
+
 	@Inject
-	private IRoleRepository roleRepository;
+	IRoleRepository roleRepository;
+
+	@Inject
+	private UserEntityService userEntityService;
 
 	@Inject
 	private IFileStorageService fileStorageService;
@@ -50,70 +56,64 @@ public class UserService {
 	@Inject
 	private PasswordEncoder passwordEncoder;
 
+	@Inject
+	@Qualifier(UserDetailsValidator.BEAN_NAME)
+	private IValidator userDetailsValidator;
+
+	private static final String DEFAULT_NEW_USER_ROLE_NAME = RolesEnum.USER.getRoleName();
+
 	/**
-	 * Saves the given {@link User} with the password encoded.
+	 * Validates and then saves the given {@link User} with the password encoded.
+	 * Also, assigns the default role to a new user.
 	 * 
 	 * @param user {@link User} instance.
-	 * @return the {@link User} saved instance.
 	 * @throws TechnicalException
+	 * @throws ValidationException
 	 */
-	//TODO: make transactional
-	public User saveUser(User user) throws TechnicalException {
-		
-		boolean isNewUser = Objects.isNull(user.getId());
-	
-		String password = user.getPassword();
-		if (!Objects.isNull(password)) {
-			String encodedPassword = passwordEncoder.encode(password);
-			user.setPassword(encodedPassword);
+	// TODO: make transactional
+	public void saveUser(User user) throws TechnicalException, ValidationException {
+
+		userDetailsValidator.validate(user);
+
+		encodePassword(user, passwordEncoder);
+
+		if (userEntityService.isNewUser(user.getEmailId())) {
+			assignDefaultRoleToNewUser(user);
+			userRepository.save(user);
+		} else {
+			userEntityService.mergeUser(user);
 		}
-		
-		// assign default role to a new user
-		if (isNewUser) {
-			
-			Optional<Role> queryResult = roleRepository.findByName(RolesEnum.USER.getRoleName());
-			queryResult.orElseThrow(()-> new TechnicalException("Given role does not exist to be assigned to a user"));
-			Role role = queryResult.get();
-			
-			UserRoles userRoles = new UserRoles(user, role);
-			user.setUserRoles(Arrays.asList(userRoles));
-		}
-		
-		return userRepository.save(user);
 	}
 
 	/**
-	 * Gets the {@link User} identified by the given user id.
+	 * Gets the {@link User} identified by the given email id.
 	 * 
-	 * @param userId id of the {@link User} to be read.
-	 * @return {@link User} instance identified by the given user id.
+	 * @param emailId id of the {@link User} to be read.
+	 * @return {@link User} instance identified by the given email id.
+	 * @throws TechnicalException
 	 */
-	public User getUser(UUID userId) {
+	public User getUser(String emailId) throws TechnicalException {
 
-		return userRepository.findById(userId).orElse(null);
+		return userEntityService.getUserByEmailId(emailId);
 	}
 
 	/**
 	 * Saves the given image of the {@link User}.
 	 * 
-	 * @param userId    id of {@link User} whose image needs to be saved.
+	 * @param emailId   id of {@link User} whose image needs to be saved.
 	 * @param imageFile image file of the {@link User}.
 	 * @throws TechnicalException
 	 */
-	public void saveUserImage(UUID userId, MultipartFile imageFile) throws TechnicalException {
+	public void saveUserImage(String emailId, MultipartFile imageFile) throws TechnicalException {
 
-		User user = getUser(userId);
-		if (Objects.isNull(user)) {
-			LOGGER.error("User does not exist for whom the image is to be uploaded.");
-			throw new TechnicalException("User does not exist for whom the image is to be uploaded.");
-		}
+		User user = userEntityService.getUserByEmailId(emailId);
 
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put(FILE_ID, user.getImageId());
 		try {
 			String imageId = fileStorageService.uploadFile(imageFile, parameters);
 			user.setImageId(imageId);
-			saveUser(user);
+			userRepository.save(user);
 		} catch (FileStorageException e) {
 			LOGGER.error("Error occurred while uploading user image file.");
 			throw new TechnicalException(e);
@@ -123,17 +123,13 @@ public class UserService {
 	/**
 	 * Deletes image file corresponding to the {@link User} from the storage.
 	 * 
-	 * @param userId id of {@link User} whose image needs to be deleted.
+	 * @param emailId email id of {@link User} whose image needs to be deleted.
 	 * @throws TechnicalException
 	 */
-	public void deleteUserImage(UUID userId) throws TechnicalException {
+	public void deleteUserImage(String emailId) throws TechnicalException {
 
-		User user = getUser(userId);
+		User user = userEntityService.getUserByEmailId(emailId);
 
-		if (Objects.isNull(user)) {
-			LOGGER.error("User does not exist whose image is to be deleted.");
-			throw new TechnicalException("User does not exist whose image is to be deleted.");
-		}
 		if (Objects.isNull(user.getImageId())) {
 			LOGGER.error("No image exists to delete for the given user.");
 			throw new TechnicalException("No image exists to delete for the given user.");
@@ -144,10 +140,41 @@ public class UserService {
 		try {
 			fileStorageService.deleteFile(parameters);
 			user.setImageId(null);
-			saveUser(user);
+			userRepository.save(user);
 		} catch (FileStorageException e) {
 			LOGGER.error("Error occurred while deleting user image file.");
 			throw new TechnicalException(e);
 		}
+	}
+
+	/**
+	 * Encodes the password in the given {@link User} instance.
+	 * 
+	 * @param user            {@link User} instance.
+	 * @param passwordEncoder {@link PasswordEncoder} instance.
+	 */
+	private void encodePassword(User user, PasswordEncoder passwordEncoder) {
+
+		String password = user.getPassword();
+		if (!Objects.isNull(password)) {
+			String encodedPassword = passwordEncoder.encode(password);
+			user.setPassword(encodedPassword);
+		}
+	}
+
+	/**
+	 * Assigns a default role to the given new {@link User}.
+	 * 
+	 * @param user {@link User} to whom role needs to be assigned.
+	 * @throws TechnicalException
+	 */
+	public void assignDefaultRoleToNewUser(User user) throws TechnicalException {
+
+		Optional<Role> queryResult = roleRepository.findByName(DEFAULT_NEW_USER_ROLE_NAME);
+		queryResult.orElseThrow(() -> new TechnicalException("Given role does not exist to be assigned to a user"));
+		Role role = queryResult.get();
+
+		UserRoles userRoles = new UserRoles(user, role);
+		user.setUserRoles(Arrays.asList(userRoles));
 	}
 }
