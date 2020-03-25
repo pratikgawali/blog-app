@@ -71,30 +71,30 @@ public class UserEntityService {
 		queryResult.orElseThrow(
 				() -> new TechnicalException("User does not exist whose information needs to be updated."));
 
-		User user = queryResult.get();
+		User existingUser = queryResult.get();
 
-		updatedUser.setId(user.getId());
+		updatedUser.setId(existingUser.getId());
 
-		if (!Objects.isNull(updatedUser.getFirstName())) {
-			user.setFirstName(updatedUser.getFirstName());
+		if (Objects.nonNull(updatedUser.getFirstName())) {
+			existingUser.setFirstName(updatedUser.getFirstName());
 		}
 
-		if (!Objects.isNull(updatedUser.getLastName())) {
-			user.setLastName(updatedUser.getLastName());
+		if (Objects.nonNull(updatedUser.getLastName())) {
+			existingUser.setLastName(updatedUser.getLastName());
 		}
 
-		if (!Objects.isNull(updatedUser.getCredentials())) {
-			user.setCredentials(updatedUser.getCredentials());
+		if (Objects.nonNull(updatedUser.getCredentials())) {
+			existingUser.setCredentials(updatedUser.getCredentials());
 		}
 
-		if (!Objects.isNull(updatedUser.getImageId())) {
-			user.setImageId(updatedUser.getImageId());
+		if (Objects.nonNull(updatedUser.getImageId())) {
+			existingUser.setImageId(updatedUser.getImageId());
 		}
 
-		if (!Objects.isNull(updatedUser.getPassword())) {
-			user.setPassword(updatedUser.getPassword());
+		if (Objects.nonNull(updatedUser.getPassword())) {
+			existingUser.setPassword(updatedUser.getPassword());
 		}
 
-		userRepository.save(user);
+		userRepository.save(existingUser);
 	}
 }

@@ -63,26 +63,43 @@ public class UserService {
 	private static final String DEFAULT_NEW_USER_ROLE_NAME = RolesEnum.USER.getRoleName();
 
 	/**
-	 * Validates and then saves the given {@link User} with the password encoded.
-	 * Also, assigns the default role to a new user.
+	 * Validates and then created a {@link User} with the password encoded. Also,
+	 * assigns the default role to the user.
 	 * 
-	 * @param user {@link User} instance.
+	 * @param user {@link User} details.
 	 * @throws TechnicalException
 	 * @throws ValidationException
 	 */
 	// TODO: make transactional
-	public void saveUser(User user) throws TechnicalException, ValidationException {
+	public void createUser(User user) throws TechnicalException, ValidationException {
 
 		userDetailsValidator.validate(user);
 
 		encodePassword(user, passwordEncoder);
+		assignDefaultRoleToNewUser(user);
 
-		if (userEntityService.isNewUser(user.getEmailId())) {
-			assignDefaultRoleToNewUser(user);
-			userRepository.save(user);
-		} else {
-			userEntityService.mergeUser(user);
+		userRepository.save(user);
+	}
+
+	/**
+	 * Validates and then updates the {@link User} with the details given.
+	 * 
+	 * @param user    details of user to be updated with.
+	 * @param emailId to identify the user whose details needs to be updated.
+	 * @throws ValidationException
+	 * @throws TechnicalException
+	 */
+	public void updateUser(User user, String emailId) throws ValidationException, TechnicalException {
+
+		if (Objects.nonNull(user.getEmailId()) || Objects.nonNull(user.getPassword())) {
+			LOGGER.error("Sensitive information cannot be updated via the update service.");
+			throw new ValidationException("Sensitive information cannot be updated via the update service.");
 		}
+
+		user.setEmailId(emailId); // to identify the user whose details needs to be updated.
+		userDetailsValidator.validate(user);
+
+		userEntityService.mergeUser(user);
 	}
 
 	/**

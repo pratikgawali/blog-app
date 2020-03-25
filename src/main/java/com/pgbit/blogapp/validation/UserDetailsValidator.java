@@ -39,21 +39,23 @@ public class UserDetailsValidator implements IValidator {
 		User user = (User) userDetails;
 
 		boolean isNewUser = userEntityService.isNewUser(user.getEmailId());
-
+		
 		String firstName = user.getFirstName();
 		if (isValidationRelevant(isNewUser, firstName)) {
 			validateFirstName(firstName);
 		}
 
-		// email id validation is relevant for both create & update scenario
-		validateEmailId(user.getEmailId());
+		String emailId = user.getEmailId();
+		if (isValidationRelevant(isNewUser, emailId)) {
+			validateEmailId(emailId);
+		}
 
 		String password = user.getPassword();
 		if (isValidationRelevant(isNewUser, password)) {
 			validatePassword(password);
 		}
 	}
-
+	
 	/**
 	 * Validates the first name of the user.
 	 * 
@@ -115,6 +117,6 @@ public class UserDetailsValidator implements IValidator {
 	 * @return true if validation is relevant, otherwise false.
 	 */
 	private boolean isValidationRelevant(boolean isNewUser, Object value) {
-		return isNewUser || (!isNewUser && !Objects.isNull(value));
+		return isNewUser || (!isNewUser && Objects.nonNull(value));
 	}
 }
