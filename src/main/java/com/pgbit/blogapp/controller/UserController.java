@@ -1,12 +1,12 @@
 package com.pgbit.blogapp.controller;
 
-import java.util.UUID;
+import java.security.Principal;
 
 import javax.inject.Inject;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pgbit.blogapp.exception.TechnicalException;
+import com.pgbit.blogapp.exception.ValidationException;
 import com.pgbit.blogapp.model.User;
 import com.pgbit.blogapp.service.UserService;
 
@@ -32,51 +33,72 @@ public class UserController {
 	private UserService userService;
 
 	/**
-	 * Gets {@link User} identified by the given user id.
+	 * Gets {@link User} identified by the given email id.
 	 * 
-	 * @param userId id of the user.
-	 * @return {@link User} instance identified by the given user id.
+	 * @param emailId email id of the user.
+	 * @return {@link User} instance identified by the given email id.
+	 * @throws TechnicalException
 	 */
-	@GetMapping("/{userId}")
-	public User getUser(@PathVariable(name = "userId") UUID userId) {
-		return userService.getUser(userId);
+	@GetMapping("")
+	public User getUser(@RequestParam("emailId") String emailId) throws TechnicalException {
+		return userService.getUser(emailId);
 	}
 
 	/**
-	 * Saves the given {@link User} instance.
+	 * Creates a new {@link User}.
 	 * 
-	 * @param user {@link User} instance to be saved.
-	 * @return the saved {@link User} instance.
-	 * @throws TechnicalException 
+	 * @param user {@link User} details of the new user.
+	 * @throws TechnicalException
+	 * @throws ValidationException
 	 */
 	@PostMapping
-	public User saveUser(@RequestBody User user) throws TechnicalException {
-		return userService.saveUser(user);
+	public void createUser(@RequestBody User user) throws TechnicalException, ValidationException {
+
+		userService.createUser(user);
 	}
 
 	/**
-	 * Saves image of the {@link User} identified by the given user id.
+	 * Updates the {@link User} details.
 	 * 
-	 * @param userId    id of the {@link User} for whom image needs to be saved.
+	 * @param principal identifies currently logged in user.
+	 * @param user contains {@link User} details to be updated with.
+	 * @throws ValidationException
+	 * @throws TechnicalException
+	 */
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@PostMapping("/update")
+	public void updateUser(Principal principal, @RequestBody User user) throws ValidationException, TechnicalException {
+
+		String emailId = principal.getName();
+		userService.updateUser(user, emailId);
+	}
+
+	/**
+	 * Saves image of the logged in {@link User}.
+	 * 
 	 * @param imageFile image file to be saved.
 	 * @throws TechnicalException
 	 */
-	@PostMapping("/photo")
-	public void saveUserImage(@RequestParam("userId") UUID userId, @RequestParam("photo") MultipartFile imageFile)
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@PostMapping("/image")
+	public void saveUserImage(Principal principal, @RequestParam("imageFile") MultipartFile imageFile)
 			throws TechnicalException {
 
-		userService.saveUserImage(userId, imageFile);
+		String emailId = principal.getName();
+		userService.saveUserImage(emailId, imageFile);
+
 	}
 
 	/**
-	 * Deletes image of the {@link User} identified by the given user id.
+	 * Deletes image of the logged in {@link User}.
 	 * 
-	 * @param userId id of the {@link User} for whom image needs to be deleted.
 	 * @throws TechnicalException
 	 */
-	@DeleteMapping("/photo/{userId}")
-	public void deleteUserImage(@PathVariable(name = "userId") UUID userId) throws TechnicalException {
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@DeleteMapping("/image")
+	public void deleteUserImage(Principal principal) throws TechnicalException {
 
-		userService.deleteUserImage(userId);
+		String emailId = principal.getName();
+		userService.deleteUserImage(emailId);
 	}
 }

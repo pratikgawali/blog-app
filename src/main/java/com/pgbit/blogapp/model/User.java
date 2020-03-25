@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 @Table(name = "USER")
 public class User {
 
+	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Type(type = "uuid-char")
