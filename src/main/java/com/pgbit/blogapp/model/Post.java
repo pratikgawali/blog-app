@@ -36,17 +36,17 @@ public class Post {
 	@Column(name = "ID")
 	private UUID id;
 
-	@Column(name = "TITLE")
+	@Column(name = "TITLE", nullable = false)
 	private String title;
 
 	@Lob
-	@Column(name = "CONTENT")
+	@Column(name = "CONTENT", nullable = false)
 	private String content;
 
-	@Column(name = "VIEWS")
+	@Column(name = "VIEWS", nullable = false)
 	private Long views;
 
-	@Column(name = "UP_VOTES")
+	@Column(name = "UP_VOTES", nullable = false)
 	private Long upVotes;
 
 	@CreatedDate

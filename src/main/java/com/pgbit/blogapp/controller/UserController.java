@@ -61,7 +61,7 @@ public class UserController {
 	 * Updates the {@link User} details.
 	 * 
 	 * @param principal identifies currently logged in user.
-	 * @param user contains {@link User} details to be updated with.
+	 * @param user      contains {@link User} details to be updated with.
 	 * @throws ValidationException
 	 * @throws TechnicalException
 	 */
@@ -76,6 +76,7 @@ public class UserController {
 	/**
 	 * Saves image of the logged in {@link User}.
 	 * 
+	 * @param principal identifies currently logged in user.
 	 * @param imageFile image file to be saved.
 	 * @throws TechnicalException
 	 */
@@ -92,6 +93,7 @@ public class UserController {
 	/**
 	 * Deletes image of the logged in {@link User}.
 	 * 
+	 * @param principal identifies currently logged in user.
 	 * @throws TechnicalException
 	 */
 	@PreAuthorize("hasRole('ROLE_USER')")

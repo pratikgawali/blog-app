@@ -31,3 +31,11 @@ build/
 .vscode/
 /mvnw
 /mvnw.cmd
+
+
+### Log Files ###
+*.log
+*.log.gz
+
+### Maven files ###
+.mvn

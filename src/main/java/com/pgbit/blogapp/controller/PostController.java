@@ -1,10 +1,12 @@
 package com.pgbit.blogapp.controller;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pgbit.blogapp.exception.TechnicalException;
+import com.pgbit.blogapp.exception.ValidationException;
 import com.pgbit.blogapp.model.Post;
 import com.pgbit.blogapp.service.PostService;
 
@@ -55,32 +58,57 @@ public class PostController {
 	/**
 	 * Saves a new {@link Post} to the database.
 	 * 
-	 * @param post {@link Post} instance to be saved.
-	 * @return the saved {@link Post} instance.
+	 * @param principal identifies currently logged in user.
+	 * @param post      {@link Post} instance to be saved.
+	 * @throws TechnicalException
 	 */
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@PostMapping
-	public Post savePost(@RequestBody Post post) {
-		return postService.savePost(post);
+	public void createPost(Principal principal, @RequestBody Post post) throws TechnicalException {
+
+		String emailId = principal.getName();
+		postService.createPost(post, emailId);
+	}
+	
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@PostMapping("/update")
+	public void updatePost(Principal principal, @RequestBody Post post) throws TechnicalException, ValidationException {
+
+		String emailId = principal.getName();
+		postService.updatePost(post, emailId);
 	}
 
 	/**
 	 * Delete a {@link Post} identified by the given post id.
 	 * 
-	 * @param postId id of the {@link Post} to be deleted.
+	 * @param principal identifies currently logged in user.
+	 * @param postId    id of the {@link Post} to be deleted.
+	 * @throws ValidationException
+	 * @throws TechnicalException
 	 */
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@DeleteMapping("/{postId}")
-	public void deletePost(@PathVariable(name = "postId") UUID postId) {
-		postService.deletePost(postId);
+	public void deletePost(Principal principal, @PathVariable(name = "postId") UUID postId)
+			throws TechnicalException, ValidationException {
+
+		String emailId = principal.getName();
+		postService.deletePost(postId, emailId);
 	}
 
 	/**
 	 * Upvote a {@link Post} identified by the given post id.
 	 * 
-	 * @param postId id of the {@link Post} that needs to be upvoted.
+	 * @param principal identifies currently logged in user.
+	 * @param postId    id of the {@link Post} that needs to be upvoted.
 	 * @throws TechnicalException
+	 * @throws ValidationException
 	 */
+	@PreAuthorize("hasRole('ROLE_USER')")
 	@PostMapping("/upVote/{postId}")
-	public void incrementUpVotes(@PathVariable(name = "postId") UUID postId) throws TechnicalException {
-		postService.incrementUpVotes(postId);
+	public void incrementUpVotes(Principal principal, @PathVariable(name = "postId") UUID postId)
+			throws TechnicalException, ValidationException {
+
+		String emailId = principal.getName();
+		postService.incrementUpVotes(postId, emailId);
 	}
 }
